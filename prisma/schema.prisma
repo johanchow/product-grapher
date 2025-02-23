@@ -1,0 +1,23 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Artifact {
+  id          String   @id @default(uuid()) @map("id") // 使用 UUID 作为主键
+  userId      String   @map("user_id") // 映射到数据库中的 user_id
+  name        String   @map("name") // 映射到数据库中的 name
+  createTime  DateTime @default(now()) @map("create_time") // 映射到数据库中的 create_time
+  modifyTime  DateTime @updatedAt @map("modify_time") // 映射到数据库中的 modify_time
+  imageUrl    String   @map("image_url") // 映射到数据库中的 image_url
+}
