@@ -1,4 +1,5 @@
-import { useSession, signIn, signOut } from 'next-auth/react';
+'use client'
+import { useSession, signIn, signOut, SessionProvider } from 'next-auth/react';
 import Image from 'next/image';
 import styles from './layout.module.scss';
 
@@ -17,11 +18,15 @@ const Header = () => {
             <button onClick={() => signOut()}>登出</button>
           </>
         ) : (
-          <button onClick={() => signIn()}>登录</button>
+          <button onClick={() => signIn('google')}>登录</button>
         )}
       </div>
     </header>
   );
 };
 
-export default Header;
+const HeaderWrapper = () => {
+  return <SessionProvider><Header /></SessionProvider>
+}
+
+export default HeaderWrapper

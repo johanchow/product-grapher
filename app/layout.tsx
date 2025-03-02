@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { SessionProvider } from 'next-auth/react';
 import './globals.scss';
 import Header from './header';
 import styles from './layout.module.scss';
@@ -17,17 +16,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SessionProvider>
-          <div className={styles.container}>
-            <Header />
-            <main className={styles.main}>
-              {children}
-            </main>
-            <footer className={styles.footer}>
-              <p>© 2024 您的公司名称 | ICP备案号：京ICP备XXXXXXXX号-X</p>
-            </footer>
-          </div>
-        </SessionProvider>
+        <div className={styles.container}>
+          <Header />
+          <main className={styles.main}>
+            {children}
+          </main>
+          <footer className={styles.footer}>
+            <p>© 2024 您的公司名称 | ICP备案号：京ICP备XXXXXXXX号-X</p>
+          </footer>
+        </div>
       </body>
     </html>
   );

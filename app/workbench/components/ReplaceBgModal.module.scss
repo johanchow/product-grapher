@@ -1,0 +1,91 @@
+$modal-bg-color: white;
+$modal-border-radius: 8px;
+$modal-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+$primary-color: #1a73e8;
+$error-color: red;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
+  z-index: 900; /* 确保遮罩层在其他内容之上 */
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: $modal-bg-color;
+  border-radius: $modal-border-radius;
+  box-shadow: $modal-shadow;
+  padding: 20px;
+  z-index: 1000; /* 确保弹窗在其他内容之上 */
+  width: 800px; /* 设置固定宽度 */
+
+  h2 {
+    text-align: center;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+  }
+
+  label {
+    display: block;
+    margin: 10px 0;
+  }
+
+  .radioGroup {
+    display: flex;
+    justify-content: flex-start; /* 在一行中均匀分布 */
+    margin-bottom: 10px; /* 与其他元素的间距 */
+    gap: 32px;
+
+    label {
+      margin: 0; /* 去掉 margin，使其靠近 */
+    }
+  }
+
+  input[type="file"] {
+    margin-top: 10px; /* 文件选择器与其他元素的间距 */
+    padding: 5px; /* 添加内边距 */
+    border: 1px solid #ccc; /* 边框 */
+    border-radius: 4px; /* 圆角效果 */
+  }
+
+  textarea {
+    width: 100%;
+    height: 100px;
+    margin-top: 10px;
+    padding: 5px; /* 添加内边距 */
+    border: 1px solid #ccc; /* 边框 */
+    border-radius: 4px; /* 圆角效果 */
+  }
+
+  button {
+    margin-top: 10px;
+    margin-right: 10px;
+    border: none; /* 去掉边框 */
+    border-radius: 4px; /* 圆角效果 */
+    padding: 10px 20px; /* 内边距 */
+    cursor: pointer; /* 鼠标悬停时显示为可点击 */
+
+    &.primary {
+      background-color: $primary-color; /* 按钮背景颜色 */
+      color: white; /* 按钮文字颜色 */
+    }
+  }
+}
+
+.error {
+  color: $error-color; /* 错误信息为红色 */
+  margin-top: 10px; /* 与其他元素的间距 */
+  text-align: left; /* 错误信息居中 */
+}
