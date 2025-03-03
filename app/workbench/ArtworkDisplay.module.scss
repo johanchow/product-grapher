@@ -1,53 +1,63 @@
+$container-padding: 20px;
+$preview-bg-color: #f9f9f9;
+$toolbar-bg-color: #f9f9f9;
+$border-radius: 8px;
+$shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+$primary-color: #1a73e8;
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* 左对齐 */
-  padding: 20px; /* 添加内边距 */
-}
+  padding: $container-padding; /* 添加内边距 */
 
-.content {
-  margin-bottom: 20px; /* 内容与上传按钮之间的间距 */
-}
+  .content {
+    margin-bottom: 20px; /* 内容与上传按钮之间的间距 */
+  }
 
-.previewToolbar {
-  display: flex; /* 使用 flexbox 布局 */
-  align-items: flex-start; /* 垂直对齐 */
-  width: 100%; /* 使其占满宽度 */
-}
+  .previewToolbar {
+    display: flex; /* 使用 flexbox 布局 */
+    align-items: flex-start; /* 垂直对齐 */
+    width: 100%; /* 使其占满宽度 */
 
-.preview {
-  margin-right: 20px; /* 预览与工具栏之间的间距 */
-  border-radius: 8px; /* 圆角效果 */
-  padding: 10px; /* 内边距 */
-  background-color: #f9f9f9; /* 背景颜色 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-}
+    input[type="file"] {
+      margin-right: 20px; /* 预览与工具栏之间的间距 */
+    }
 
-.toolbar {
-  display: flex;
-  flex-wrap: wrap; /* 允许换行 */
-  justify-content: flex-start; /* 工具栏紧靠右侧 */
-  width: 360px; /* 工具栏宽度 */
-  margin-left: 24px;
-  gap: 20px;
-  background-color: #f9f9f9; /* 背景颜色 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-  border-radius: 8px; /* 圆角效果 */
-  padding: 10px; /* 内边距 */
-  height: 300px; /* 设置与预览区域相同的高度 */
-}
+    .preview {
+      border-radius: $border-radius; /* 圆角效果 */
+      padding: 10px; /* 内边距 */
+      background-color: $preview-bg-color; /* 背景颜色 */
+      box-shadow: $shadow; /* 添加阴影效果 */
+    }
 
-.tool {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 图标和文字居中对齐 */
-  cursor: pointer; /* 鼠标悬停时显示为可点击 */
-  margin: 5px; /* 工具之间的间距 */
-  width: 60px;
-}
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap; /* 允许换行 */
+      justify-content: flex-start; /* 工具栏紧靠右侧 */
+      width: 360px; /* 工具栏宽度 */
+      margin-left: 24px;
+      gap: 20px;
+      background-color: $toolbar-bg-color; /* 背景颜色 */
+      box-shadow: $shadow; /* 添加阴影效果 */
+      border-radius: $border-radius; /* 圆角效果 */
+      padding: 10px; /* 内边距 */
+      height: 300px; /* 设置与预览区域相同的高度 */
 
-.tool span {
-  margin-top: 5px; /* 图标与文字之间的间距 */
+      .tool {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* 图标和文字居中对齐 */
+        cursor: pointer; /* 鼠标悬停时显示为可点击 */
+        margin: 5px; /* 工具之间的间距 */
+        width: 60px;
+
+        span {
+          margin-top: 5px; /* 图标与文字之间的间距 */
+        }
+      }
+    }
+  }
 }
 
 .modal {

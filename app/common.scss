@@ -1,0 +1,23 @@
+$modal-bg-color: white;
+$modal-border-radius: 8px;
+$modal-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
+  z-index: 900; /* 确保遮罩层在其他内容之上 */
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $modal-bg-color;
+    border-radius: $modal-border-radius;
+    box-shadow: $modal-shadow;
+    padding: 20px;
+    z-index: 1000; /* 确保弹窗在其他内容之上 */
+  }
+}
