@@ -2,19 +2,18 @@
 
 import React, { useEffect, useState } from 'react';
 import { Stage, Layer, Rect, Image as KonvaImage } from 'react-konva';
-import { createWorkbenchStore } from '@/store/workbench-store';
+import { useWorkbenchStore } from '@/provider/workbench-store-provider';
 
 interface ImagePreviewProps {
   image: string | null;
 }
 
-const useStore = createWorkbenchStore();
 const ImagePreview: React.FC<ImagePreviewProps> = ({ image }) => {
   // const [rect, setRect] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [imgElement, setImgElement] = useState<HTMLImageElement | undefined>();
   const [isDrawing, setIsDrawing] = useState(false);
   const [showImageSize, setShowImageSize] = useState<{ width: number; height: number } | null>(null);
-  const { circleRect, setCircleRect } = useStore();
+  const { circleRect, setCircleRect } = useWorkbenchStore((state) => state);
 
   useEffect(() => {
     if (!image) {

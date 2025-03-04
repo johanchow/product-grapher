@@ -1,6 +1,7 @@
 import Image from 'next/image';
 // import { getServerSession } from 'next-auth/next'; // 假设您使用 next-auth 进行身份验证
 // import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { WorkbenchStoreProvider } from '@/provider/workbench-store-provider';
 import { fetchArtworks } from './rpc';
 import ArtworkDisplay from './ArtworkDisplay'; // 导入新组件
 import styles from './workbench.module.scss';
@@ -47,7 +48,9 @@ export default async function Workbench({ searchParams }: {
       </aside>
 
       <main className={styles.main}>
-        <ArtworkDisplay artifactId={artifactId} />
+        <WorkbenchStoreProvider>
+          <ArtworkDisplay artifactId={artifactId} />
+        </WorkbenchStoreProvider>
       </main>
     </div>
   );
