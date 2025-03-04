@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import dynamic from "next/dynamic";
-import ReplaceBgModal from './components/ReplaceBgModal';
+import { useWorkbenchStore } from '@/provider/workbench-store-provider';
+import AddPictureModal from './components/AddPictureModal';
 import styles from './ArtworkDisplay.module.scss';
 
 interface ArtworkDisplayProps {
@@ -22,8 +23,8 @@ const ImagePreview = dynamic(() => import("./components/ImagePreview"), { ssr: f
 const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [showReplaceBgModal, setReplaceBgModal] = useState(false);
-  const [insertPictureStatus, setInsertPictureStatus] = useState<InsertElementStatus>(InsertElementStatus.Ready);
+  const [showAddPictureModal, setShowAddPictureModal] = useState(false);
+  const { circleRect, setCircleRect } = useWorkbenchStore((state) => state);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,10 +43,15 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
     // 处理提交逻辑
   };
 
-  const onClickInsert = () => {
-    if (true) {
+  const onClickInsert = (contentType: string) => {
+    if (!circleRect) {
       alert('请先在原图上圈选区域');
       return;
+    }
+    if (contentType === 'picture') {
+      setShowAddPictureModal(true);
+    }
+    if (contentType === 'text') {
     }
   };
 
@@ -68,15 +74,15 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
               <ImagePreview image={previewImage} />
             </div>
             <div className={styles.toolbar}>
-              <div className={styles.tool} onClick={() => setReplaceBgModal(true)}>
+              <div className={styles.tool} onClick={() => setShowAddPictureModal(true)}>
                 <Image src="/icons/background.svg" alt="换背景" width={24} height={24} />
                 <span>换背景</span>
               </div>
-              <div className={styles.tool} onClick={() => setInsertPictureStatus(InsertElementStatus.CircleRectangle)}>
+              <div className={styles.tool} onClick={() => onClickInsert('picture')}>
                 <Image src="/icons/illustration.svg" alt="插图" width={24} height={24} />
                 <span>插图</span>
               </div>
-              <div className={styles.tool}>
+              <div className={styles.tool} onClick={() => onClickInsert('text')}>
                 <Image src="/icons/text.svg" alt="插文字" width={24} height={24} />
                 <span>插文字</span>
               </div>
@@ -89,9 +95,9 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
         )}
       </div>
 
-      <ReplaceBgModal
-        showModal={showReplaceBgModal}
-        setShowModal={setReplaceBgModal}
+      <AddPictureModal
+        showModal={showAddPictureModal}
+        setShowModal={setShowAddPictureModal}
         onSubmit={handleModalSubmit}
       />
     </div>

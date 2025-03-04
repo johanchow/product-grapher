@@ -2,15 +2,15 @@
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import styles from './ReplaceBgModal.module.scss'; // 导入样式文件
+import styles from './AddPictureModal.module.scss'; // 导入样式文件
 
-interface ReplaceBgModalProps {
+interface AddPictureModalProps {
   showModal: boolean;
   setShowModal: (show: boolean) => void;
   onSubmit: (option: 'upload' | 'text', description: string) => void;
 }
 
-const ReplaceBgModal: React.FC<ReplaceBgModalProps> = ({ showModal, setShowModal, onSubmit }) => {
+const AddPictureModal: React.FC<AddPictureModalProps> = ({ showModal, setShowModal, onSubmit }) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [selectedOption, setSelectedOption] = useState<'upload' | 'text'>('upload'); // 选项状态
 
@@ -77,4 +77,4 @@ const ReplaceBgModal: React.FC<ReplaceBgModalProps> = ({ showModal, setShowModal
   );
 };
 
-export default ReplaceBgModal;
+export default AddPictureModal;
