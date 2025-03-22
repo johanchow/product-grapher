@@ -1,12 +1,13 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import dynamic from "next/dynamic";
 import { useWorkbenchStore } from '@/provider/workbench-store-provider';
 import AddPictureModal from './components/AddPictureModal';
 import AddTextModal from './components/AddTextModal';
 import styles from './ArtworkDisplay.module.scss';
+import type { ImagePreviewRef } from './components/ImagePreview';
 
 interface ArtworkDisplayProps {
   artifactId: string | null;
@@ -23,11 +24,13 @@ const ImagePreview = dynamic(() => import("./components/ImagePreview"), { ssr: f
 
 const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [showAddPictureModal, setShowAddPictureModal] = useState(false);
   const [showAddTextModal, setShowAddTextModal] = useState(false);
-  const { circleRect } = useWorkbenchStore((state) => state);
-  console.log('11111111');
+  const { circleRect, imageData: { current: previewImage }, setImageAction } = useWorkbenchStore((state) => state);
+  const [textFont, setTextFont] = useState<{text: string; font: string}>();
+  const imagePreviewRef = useRef<ImagePreviewRef>(null);
+
+  const isEditing: boolean = !!textFont?.text;
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -35,7 +38,8 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
       setSelectedImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
+        const imagePreview = reader.result as string;
+        setImageAction(imagePreview);
       };
       reader.readAsDataURL(file);
     }
@@ -59,6 +63,15 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
     }
   };
 
+  const onClickUpdate = () => {
+    imagePreviewRef.current?.updateImage();
+    setTextFont(undefined); // 清除文本编辑状态
+  };
+
+  const onClickCancel = () => {
+    setTextFont({text: '', font: ''});
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -75,7 +88,10 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
         {previewImage && (
           <>
             <div className={styles.preview}>
-              <ImagePreview image={previewImage} />
+              <ImagePreview
+                ref={imagePreviewRef}
+                textFont={textFont}
+              />
             </div>
             <div className={styles.toolbar}>
               <div className={styles.tool} onClick={() => setShowAddPictureModal(true)}>
@@ -102,6 +118,19 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
                 <Image src="/icons/text.svg" alt="重置" width={24} height={24} />
                 <span>重置</span>
               </div>
+              {
+                isEditing ? (<>
+                  <div className={styles.tool} onClick={onClickUpdate}>
+                    <Image src="/icons/text.svg" alt="确认" width={24} height={24} />
+                    <span>确认</span>
+                  </div>
+                  <div className={styles.tool} onClick={onClickCancel}>
+                    <Image src="/icons/text.svg" alt="取消" width={24} height={24} />
+                    <span>取消</span>
+                  </div>
+                  </>
+                ) : (<></>)
+              }
             </div>
           </>
         )}
@@ -110,15 +139,16 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
       <AddPictureModal
         showModal={showAddPictureModal}
         setShowModal={setShowAddPictureModal}
-        onSubmit={handleModalSubmit}
+        onSubmit={() => {
+        }}
       />
 
       <AddTextModal
         showModal={showAddTextModal}
         setShowModal={setShowAddTextModal}
         onSubmit={({ text, font }) => {
-          console.log('插入的文字:', text);
           setShowAddTextModal(false);
+          setTextFont({text, font});
         }}
       />
     </div>
