@@ -27,6 +27,7 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
   const [showAddPictureModal, setShowAddPictureModal] = useState(false);
   const [showAddTextModal, setShowAddTextModal] = useState(false);
   const { circleRect } = useWorkbenchStore((state) => state);
+  console.log('11111111');
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
