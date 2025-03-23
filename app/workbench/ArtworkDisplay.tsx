@@ -3,8 +3,9 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import dynamic from "next/dynamic";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useWorkbenchStore } from '@/provider/workbench-store-provider';
-import AddPictureModal from './components/AddPictureModal';
+import AddThumbnailModal from './components/AddThumbnailModal';
 import AddTextModal from './components/AddTextModal';
 import styles from './ArtworkDisplay.module.scss';
 import type { ImagePreviewRef } from './components/ImagePreview';
@@ -20,13 +21,16 @@ enum InsertElementStatus {
 }
 
 const ImagePreview = dynamic(() => import("./components/ImagePreview"), { ssr: false });
-
+const queryClient = new QueryClient()
 
 const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [showAddPictureModal, setShowAddPictureModal] = useState(false);
+  const [showAddThumbnailModal, setShowAddThumbnailModal] = useState(false);
   const [showAddTextModal, setShowAddTextModal] = useState(false);
-  const { circleRect, imageData: { current: previewImage }, setImageAction } = useWorkbenchStore((state) => state);
+  const {
+    circleRect, imageData: { current: previewImage },
+    setImageAction, undoImageAction, redoImageAction, resetImageAction
+  } = useWorkbenchStore((state) => state);
   const [textFont, setTextFont] = useState<{text: string; font: string}>();
   const imagePreviewRef = useRef<ImagePreviewRef>(null);
 
@@ -56,7 +60,7 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
       return;
     }
     if (contentType === 'picture') {
-      setShowAddPictureModal(true);
+      setShowAddThumbnailModal(true);
     }
     if (contentType === 'text') {
       setShowAddTextModal(true);
@@ -73,85 +77,91 @@ const ArtworkDisplay: React.FC<ArtworkDisplayProps> = ({ artifactId }) => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
-        {artifactId ? (
-          <h1>作品 ID 为 {artifactId} 的实时预览</h1>
-        ) : (
-          <h1>效果预览</h1>
-        )}
-      </div>
-      <div className={styles.previewToolbar}>
-        {!previewImage && (
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-        )}
-        {previewImage && (
-          <>
-            <div className={styles.preview}>
-              <ImagePreview
-                ref={imagePreviewRef}
-                textFont={textFont}
-              />
-            </div>
-            <div className={styles.toolbar}>
-              <div className={styles.tool} onClick={() => setShowAddPictureModal(true)}>
-                <Image src="/icons/background.svg" alt="换背景" width={24} height={24} />
-                <span>换背景</span>
+    <QueryClientProvider client={queryClient}>
+      <div className={styles.container}>
+        <div className={styles.content}>
+          {artifactId ? (
+            <h1>作品 ID 为 {artifactId} 的实时预览</h1>
+          ) : (
+            <h1>效果预览</h1>
+          )}
+        </div>
+        <div className={styles.previewToolbar}>
+          {!previewImage && (
+            <input type="file" accept="image/*" onChange={handleImageChange} />
+          )}
+          {previewImage && (
+            <>
+              <div className={styles.preview}>
+                <ImagePreview
+                  ref={imagePreviewRef}
+                  textFont={textFont}
+                />
               </div>
-              <div className={styles.tool} onClick={() => onClickInsert('picture')}>
-                <Image src="/icons/illustration.svg" alt="插图" width={24} height={24} />
-                <span>插图</span>
+              <div className={styles.toolbar}>
+                <div className={styles.tool} onClick={() => setShowAddThumbnailModal(true)}>
+                  <Image src="/icons/background.svg" alt="换背景" width={24} height={24} />
+                  <span>换背景</span>
+                </div>
+                <div className={styles.tool} onClick={() => onClickInsert('picture')}>
+                  <Image src="/icons/illustration.svg" alt="插图" width={24} height={24} />
+                  <span>插图</span>
+                </div>
+                <div className={styles.tool} onClick={() => onClickInsert('text')}>
+                  <Image src="/icons/text.svg" alt="插文字" width={24} height={24} />
+                  <span>插文字</span>
+                </div>
+                <div className={styles.tool}>
+                  <Image src="/icons/text.svg" alt="擦除" width={24} height={24} />
+                  <span>擦除</span>
+                </div>
+                <div className={styles.tool} onClick={resetImageAction}>
+                  <Image src="/icons/text.svg" alt="重置" width={24} height={24} />
+                  <span>重置</span>
+                </div>
+                <div className={styles.tool} onClick={undoImageAction}>
+                  <Image src="/icons/text.svg" alt="回退" width={24} height={24} />
+                  <span>回退</span>
+                </div>
+                <div className={styles.tool} onClick={redoImageAction}>
+                  <Image src="/icons/text.svg" alt="前进" width={24} height={24} />
+                  <span>前进</span>
+                </div>
+                {
+                  isEditing ? (<>
+                    <div className={styles.tool} onClick={onClickUpdate}>
+                      <Image src="/icons/text.svg" alt="确认" width={24} height={24} />
+                      <span>确认</span>
+                    </div>
+                    <div className={styles.tool} onClick={onClickCancel}>
+                      <Image src="/icons/text.svg" alt="取消" width={24} height={24} />
+                      <span>取消</span>
+                    </div>
+                    </>
+                  ) : (<></>)
+                }
               </div>
-              <div className={styles.tool} onClick={() => onClickInsert('text')}>
-                <Image src="/icons/text.svg" alt="插文字" width={24} height={24} />
-                <span>插文字</span>
-              </div>
-              <div className={styles.tool}>
-                <Image src="/icons/text.svg" alt="擦除" width={24} height={24} />
-                <span>擦除</span>
-              </div>
-              <div className={styles.tool}>
-                <Image src="/icons/text.svg" alt="回退" width={24} height={24} />
-                <span>回退</span>
-              </div>
-              <div className={styles.tool}>
-                <Image src="/icons/text.svg" alt="重置" width={24} height={24} />
-                <span>重置</span>
-              </div>
-              {
-                isEditing ? (<>
-                  <div className={styles.tool} onClick={onClickUpdate}>
-                    <Image src="/icons/text.svg" alt="确认" width={24} height={24} />
-                    <span>确认</span>
-                  </div>
-                  <div className={styles.tool} onClick={onClickCancel}>
-                    <Image src="/icons/text.svg" alt="取消" width={24} height={24} />
-                    <span>取消</span>
-                  </div>
-                  </>
-                ) : (<></>)
-              }
-            </div>
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
 
-      <AddPictureModal
-        showModal={showAddPictureModal}
-        setShowModal={setShowAddPictureModal}
-        onSubmit={() => {
-        }}
-      />
+        <AddThumbnailModal
+          showModal={showAddThumbnailModal}
+          setShowModal={setShowAddThumbnailModal}
+          onSubmit={() => {
+          }}
+        />
 
-      <AddTextModal
-        showModal={showAddTextModal}
-        setShowModal={setShowAddTextModal}
-        onSubmit={({ text, font }) => {
-          setShowAddTextModal(false);
-          setTextFont({text, font});
-        }}
-      />
-    </div>
+        <AddTextModal
+          showModal={showAddTextModal}
+          setShowModal={setShowAddTextModal}
+          onSubmit={({ text, font }) => {
+            setShowAddTextModal(false);
+            setTextFont({text, font});
+          }}
+        />
+      </div>
+    </QueryClientProvider>
   );
 };
 

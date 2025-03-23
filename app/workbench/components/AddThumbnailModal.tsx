@@ -2,25 +2,50 @@
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import styles from './AddPictureModal.module.scss'; // 导入样式文件
+import { useWorkbenchStore } from '@/provider/workbench-store-provider';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import styles from './AddThumbnailModal.module.scss'; // 导入样式文件
 
-interface AddPictureModalProps {
+interface AddThumbnailModalProps {
   showModal: boolean;
   setShowModal: (show: boolean) => void;
-  onSubmit: (option: 'upload' | 'text', description: string) => void;
+  onSubmit: (values: {thumbnail: string}) => void;
 }
 
-const AddPictureModal: React.FC<AddPictureModalProps> = ({ showModal, setShowModal, onSubmit }) => {
+const queryText2Image = async ({queryKey}: {queryKey: string[]}): Promise<string> => {
+  const [, prompt, width, height] = queryKey;
+  const response = await fetch('/api/gen-ai/text-to-image', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ prompt, width, height }),
+  });
+  if (!response.ok) {
+    throw new Error('请求失败');
+  }
+  const { code, message, data: {image} } = response.json();
+  return image;
+};
+
+const AddThumbnailModal: React.FC<AddThumbnailModalProps> = ({ showModal, setShowModal, onSubmit }) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [selectedOption, setSelectedOption] = useState<'upload' | 'text'>('upload'); // 选项状态
+  const queryClient = useQueryClient();
+  const circleRect = useWorkbenchStore((state) => state.circleRect);
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value as 'upload' | 'text');
   };
 
-  const onSubmitForm = (data: any) => {
+  const onSubmitForm = async (data: any) => {
     const { description } = data;
-    onSubmit(selectedOption, description);
+    const {width, height } = circleRect!;
+    const image = await queryClient.fetchQuery({
+      queryKey: ['text-to-image', description, width, height], // 与 useQuery 的 queryKey 一致
+      queryFn: queryText2Image,
+    });
+    onSubmit({ thumbnail: image });
     setShowModal(false); // 关闭弹窗
   };
 
@@ -77,4 +102,4 @@ const AddPictureModal: React.FC<AddPictureModalProps> = ({ showModal, setShowMod
   );
 };
 
-export default AddPictureModal;
+export default AddThumbnailModal;
